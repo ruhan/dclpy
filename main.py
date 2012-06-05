@@ -26,7 +26,7 @@ if __name__ == "__main__":
     DCL.the('urls_publicas', CantAccess, 'modelos')  
     DCL.the('urls_publicas', CantAccess, 'utilidades')
 
-    DCL.the('modelos', CantInherit, 'modelos')
+    DCL.only('modelos', CantInherit, 'modelos')
     DCL.init()
 
     start_system()

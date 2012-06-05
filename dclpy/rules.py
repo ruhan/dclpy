@@ -97,7 +97,14 @@ class TheRule(Rule):
 
 class OnlyRule(Rule):
     # TODO: limit for valid ONLY descriptor
-    pass
+    def verify(self, fact):
+        return
+        m = fact.get('parent', fact.get('sender'))
+        m_target = fact.get('cls', fact.get('cls'))
+
+        if not self.mod.has(m) and not self.mod.contains(m_target):
+            pass
+        print '>>>',fact
     """
     only urls publicas (X) podem acessar os modelos (Y)
     Quer dizer que para cada novo fatos de acesso, caso mod_target == Y, 
