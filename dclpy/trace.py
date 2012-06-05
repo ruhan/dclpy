@@ -33,6 +33,8 @@ class FrameHandler(object):
     def get_last_frame(self):
         return FrameHandler(self._frame.f_back, self._event)
      
+    def get_code(self):
+        return self._frame.f_code
 
     def __str__(self):
         objeto = self.object()
@@ -58,6 +60,7 @@ class FrameHandler(object):
     object = property(get_object)
     function_name = property(get_function_name)
     last_frame = property(get_last_frame)
+    code = property(get_code)
 
 
 class FactExtractor(object):
@@ -82,7 +85,8 @@ class FactExtractor(object):
                 self.notify_new_object(
                     frame.last_frame.object, 
                     frame.object.__class__,
-                    called_func
+                    called_func,
+                    frame.code
                 )
 
                 bases = frame.object.__class__.__bases__
@@ -93,74 +97,56 @@ class FactExtractor(object):
                 # TODO: it ain't the best way to do that, because this notification 
                 # is going to be lauched more times thant we need
                 self.notify_inheritance(
-                    bases, frame.object.__class__
+                    bases, frame.object.__class__, frame.code
                 )
             else:
                 self.notify_function_call(
                     frame.last_frame.object,
                     frame.object,
-                    called_func
+                    called_func,
+                    frame.code
                 )
 
     # FIXME: For awhile, we will ignore args and kwargs of functions
-    def notify_new_object(self, sender, cls, method_name):
+    def notify_new_object(self, sender, cls, method_name, code):
         #print 'New object ', sender, ' created by ', cls
         fact = {'type': 'objcreation', 
                 'sender': sender.__class__, # or 'Main', 
-                'cls': cls}
+                'cls': cls,
+                'code': code}
                 
         DCL.notify_fact(fact)
 
-    def notify_inheritance(self, parents, subclass):
+    def notify_inheritance(self, parents, subclass, code):
         #    print 'Inheritance ', subclass, ' of class ', parent
 
         # NOTE: python has multiple inheritance
         for parent in parents:
             fact = {'type': 'inheritance', 
                     'parent': parent, 
-                    'cls': subclass}
+                    'cls': subclass,
+                    'code': code}
 
             DCL.notify_fact(fact)            
 
-    def notify_function_call(self, sender, obj, method_name):
+    def notify_function_call(self, sender, obj, method_name, code):
         #print 'Func call ', method_name, ' of object ', (obj or 'Main'), ' by ', (sender or 'Main')
 
         fact = {'type': 'methodcall', 
                 'sender': sender.__class__, 
                 'object': obj.__class__, # or 'Main',
-                'method': method_name}
+                'method': method_name,
+                'code': code}
 
         DCL.notify_fact(fact)        
 
 
 def set_listening():
     def listener(frame, event, arg, **kwargs):
-        # DEBUG PARA CAPTURAR DADOS DO FRAME ATUAL  
-        #print dir(frame)
-        #for x in dir(frame.f_code):
-        #    print "%s = <%s>" % (x, getattr(frame.f_code, x))
-
-        # PRETTY PRINT IMPORTANTE PARA WINDOWS
-        #import pprint
-        #pp = pprint.PrettyPrinter(indent=4)
-
-        #import inspect
-        #pp.pprint(inspect.getmembers(objeto))
-        #pp.pprint(objeto)
-        
-        #pp.pprint(dir(objeto.__class__))
-        #pp.pprint(traceback.extract_stack())
-
         fact = FactExtractor(FrameHandler(frame, event))
         fact.notify_facts()
-
-        if event == 'call':
-            #print frame, arg, kwargs
-            #print "F: %s, \n\tANTERIOR: %s\n" % (dclframe, dclframe.last_frame())
-            pass
 
         return listener
 
     import sys
     sys.settrace(listener)
-

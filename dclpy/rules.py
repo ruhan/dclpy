@@ -1,3 +1,4 @@
+# -*- coding: utf8 -*-
 from exception import *
 
 
@@ -42,20 +43,26 @@ class CantAccess(CanAccess):
     def check(self, fact):
         if fact['sender']:
             if super(CantAccess, self).check(fact):
-                raise ViolationException(fact, "%s can't access a method in %s" % (self.mod, self.mod_target))
+                raise ViolationException(
+                    fact, "%s can't access a method in %s" % (self.mod, self.mod_target)
+                )
 
 class CantInherit(CanInherit):
     def check(self, fact):
         if fact['parent']:
             if super(CantInherit, self).check(fact):
-                raise ViolationException(fact, "%s can't inherit from %s" % (self.mod, self.mod_target))
+                raise ViolationException(
+                    fact, "%s can't inherit from %s" % (self.mod, self.mod_target)
+                )
 
 
 class CantCreate(CanCreate):
     def check(self, fact):        
         if fact['sender']:
             if super(CantCreate, self).check(fact):
-                raise ViolationException(fact, "%s can't create %s" % (self.mod, self.mod_target))
+                raise ViolationException(
+                    fact, "%s can't create %s" % (self.mod, self.mod_target)
+                )
 
 
 
