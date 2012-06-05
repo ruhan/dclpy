@@ -21,14 +21,14 @@ if __name__ == "__main__":
     DCL.mod('modelos', 'models')
     DCL.mod('utilidades', 'models')
 
-
-    #DCL.the('urls_publicas', CantCreate, 'modelos')  
     DCL.the('urls_publicas', CantAccess, 'modelos')  
+    DCL.the('urls_publicas', CantCreate, 'modelos')      
     DCL.the('urls_publicas', CantAccess, 'utilidades')
+    DCL.the('modelos', CantInherit, 'modelos')
 
-    DCL.only('modelos', CantInherit, 'modelos')
+    #DCL.only('modelos', CanAccess, 'utilidades')
+
     DCL.init()
 
     start_system()
-
 

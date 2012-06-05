@@ -112,7 +112,7 @@ class FactExtractor(object):
         #print 'New object ', sender, ' created by ', cls
         fact = {'type': 'objcreation', 
                 'sender': sender.__class__, # or 'Main', 
-                'cls': cls,
+                'receiver': cls,
                 'code': code}
                 
         DCL.notify_fact(fact)
@@ -123,8 +123,8 @@ class FactExtractor(object):
         # NOTE: python has multiple inheritance
         for parent in parents:
             fact = {'type': 'inheritance', 
-                    'parent': parent, 
-                    'cls': subclass,
+                    'sender': parent, 
+                    'receiver': subclass,
                     'code': code}
 
             DCL.notify_fact(fact)            
@@ -134,7 +134,7 @@ class FactExtractor(object):
 
         fact = {'type': 'methodcall', 
                 'sender': sender.__class__, 
-                'object': obj.__class__, # or 'Main',
+                'receiver': obj.__class__, # or 'Main',
                 'method': method_name,
                 'code': code}
 

@@ -16,7 +16,7 @@ class ModuleDef(object):
 
     def has(self, cls):
         for module in self.modules:
-            if cls.__name__ in dir(self.modules[0]):
+            if cls.__name__ in dir(module):
                 return True
 
         return False

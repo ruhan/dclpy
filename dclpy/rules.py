@@ -1,6 +1,16 @@
 # -*- coding: utf8 -*-
 from exception import *
 
+class AffirmativeConstraint(object):
+    """
+    Base class for the Can* restrictions
+    """
+    
+class NegativeConstraint(object):
+    """
+    Base class for the Cant* restrictions
+    """
+    
 
 class Constraint(object):
     def __init__(self, mod, mod_target):
@@ -8,28 +18,28 @@ class Constraint(object):
         self.mod_target = mod_target
 
 
-class CanAccess(Constraint):
+class CanAccess(Constraint, AffirmativeConstraint):
     def check(self, fact):
         if fact['sender']:
-            if self.mod.has(fact['sender']) and self.mod_target.has(fact['object']):
+            if self.mod.has(fact['sender']) and self.mod_target.has(fact['receiver']):
                 return True
 
         return False
 
 
-class CanInherit(Constraint):
-    def check(self, fact):
-        if fact['parent']:
-            if self.mod.has(fact['parent']) and self.mod_target.has(fact['cls']):
-                return True
-
-        return False
-
-
-class CanCreate(Constraint):
+class CanInherit(Constraint, AffirmativeConstraint):
     def check(self, fact):
         if fact['sender']:
-            if self.mod.has(fact['sender']) and self.mod_target.has(fact['object']):
+            if self.mod.has(fact['sender']) and self.mod_target.has(fact['receiver']):
+                return True
+
+        return False
+
+
+class CanCreate(Constraint, AffirmativeConstraint):
+    def check(self, fact):
+        if fact['sender']:
+            if self.mod.has(fact['sender']) and self.mod_target.has(fact['receiver']):
                 return True
 
         return False
@@ -39,7 +49,7 @@ class CanCreate(Constraint):
 
 
 
-class CantAccess(CanAccess):
+class CantAccess(CanAccess, NegativeConstraint):
     def check(self, fact):
         if fact['sender']:
             if super(CantAccess, self).check(fact):
@@ -47,16 +57,16 @@ class CantAccess(CanAccess):
                     fact, "%s can't access a method in %s" % (self.mod, self.mod_target)
                 )
 
-class CantInherit(CanInherit):
+class CantInherit(CanInherit, NegativeConstraint):
     def check(self, fact):
-        if fact['parent']:
+        if fact['sender']:
             if super(CantInherit, self).check(fact):
                 raise ViolationException(
                     fact, "%s can't inherit from %s" % (self.mod, self.mod_target)
                 )
 
 
-class CantCreate(CanCreate):
+class CantCreate(CanCreate, NegativeConstraint):
     def check(self, fact):        
         if fact['sender']:
             if super(CantCreate, self).check(fact):
@@ -84,6 +94,8 @@ class Rule(object):
             mod_target
         )
 
+
+class TheRule(Rule):
     def verify(self, fact):
         try:
             self.constraint.check(fact)
@@ -92,24 +104,17 @@ class Rule(object):
             print e.message
 
 
-class TheRule(Rule):
-    pass
-
 class OnlyRule(Rule):
-    # TODO: limit for valid ONLY descriptor
     def verify(self, fact):
-        return
-        m = fact.get('parent', fact.get('sender'))
-        m_target = fact.get('cls', fact.get('cls'))
+        if issubclass(self.constraint.__class__, NegativeConstraint):
+            return TheRule(self.constraint).verify(fact)
 
-        if not self.mod.has(m) and not self.mod.contains(m_target):
-            pass
-        print '>>>',fact
-    """
-    only urls publicas (X) podem acessar os modelos (Y)
-    Quer dizer que para cada novo fatos de acesso, caso mod_target == Y, 
-    se mos != (X), temos uma violação
-    """
+        mod = fact['sender']
+        mod_target = fact['receiver']
 
+        if self.constraint.mod_target.has(mod_target):
+            if not self.constraint.mod.has(mod):
+                print 'Erro ONLY ' + str(self.constraint.mod) + " " + str(self.constraint) + " " + str(self.constraint.mod_target)
+                print 'fato contratiou: ' + str(fact)
 
 

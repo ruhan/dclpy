@@ -6,3 +6,4 @@ TODO:
 * Think a DSL Syntax
 * Improve the way we check whether a class/function belongs to a module. Instead to use an import, we should parse the file and match the names written in it
 * Validate the application in a real system
+* Log errors in a better way (se the LogEntry classes is good because we can handle reports in a myryad if formats)
