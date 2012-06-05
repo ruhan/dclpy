@@ -1,0 +1,8 @@
+
+DSL written in python for verify architectural conformity of systems written in Python, based in simple rules of restriction of interactions between modules defined by the architect of the system
+
+TODO:
+* Implement the ONLY rules
+* Think a DSL Syntax
+* Improve the way we check whether a class/function belongs to a module. Instead to use an import, we should parse the file and match the names written in it
+* Validate the application in a real system
