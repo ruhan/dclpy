@@ -101,6 +101,9 @@ class TheRule(Rule):
             self.constraint.check(fact)
         except ViolationException as e:
             # TODO: do it in a best way
+            a = open('/tmp/arqerrors.txt', 'a')
+            a.write(e.message)
+            a.close()
             print e.message
 
 

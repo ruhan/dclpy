@@ -12,7 +12,7 @@ class FrameHandler(object):
     """
     def __init__(self, frame, event):
         self._frame = frame
-        self._local_env = frame.f_locals
+        #self._local_env = frame.f_locals
         self._event = event
 
     def __bool__(self):
@@ -25,7 +25,10 @@ class FrameHandler(object):
         return self._frame.f_code.co_filename
 
     def get_object(self):
-        return self._local_env.get('self', None)
+        if self._frame.f_locals:
+            return self._frame.f_locals.get('self', None)
+        else:
+            return None
 
     def get_function_name(self):
         return self._frame.f_code.co_name
@@ -37,7 +40,7 @@ class FrameHandler(object):
         return self._frame.f_code
 
     def __str__(self):
-        objeto = self.object()
+        objeto = self.object
         nome_funcao = self.function_name
 
         modulo = None
@@ -45,7 +48,7 @@ class FrameHandler(object):
             modulo = objeto.__module__
 
         if not modulo:           
-            modulo = self._local_env.get('__package__', '') or ''
+            modulo = self._frame.f_locals.get('__package__', '') or ''
             modulo += __file__.split('.')[0] or ''
             # outra maneira:
             # >modulo = self.module()
@@ -77,6 +80,17 @@ class FactExtractor(object):
         notifyies the app about the found facts
         """
         frame = self.frame
+        #print '>>>>', self.frame._frame.f_locals
+
+        for m in ['__builtin__', 'logging', 'sre_parse', 'Cookie', 'socket', 
+                  'wsgiref', 'dclpy', 'pdb']:
+            try:
+                if frame.object.__class__.__module__.find(m) != -1:
+                    return
+            except RuntimeError, e:
+                # XXX Occurs and recursion limit error on SimpleLazyObject for
+                # user that we cant understand yet
+                return
 
         if frame:
             called_func = frame.function_name
