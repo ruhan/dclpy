@@ -1,5 +1,7 @@
 
-DSL written in python for verify architectural conformity of systems written in Python, based in simple rules of restriction of interactions between modules defined by the architect of the system
+DSL written in python for check architectural conformity of python systems. 
+
+It's based in simple constraints of interactions between modules defined by system architects.
 
 TODO:
 * Implement the ONLY rules
