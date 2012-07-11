@@ -22,6 +22,6 @@ class ModuleDef(object):
         return False
 
     def __str__(self):
-        return "<DCLModule %s>" % (self.name)
+        return "\"%s\"" % (self.name)
 
 

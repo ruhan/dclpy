@@ -11,12 +11,14 @@ def start_system():
 
     print 'FIM'
 
-    import sys
-    sys.exit(0)
+    #import sys
+    #sys.exit(0)
 
 
 
 if __name__ == "__main__":
+
+            
     DCL.mod('urls_publicas', 'controller')
     DCL.mod('modelos', 'models')
     DCL.mod('utilidades', 'models')
@@ -26,9 +28,14 @@ if __name__ == "__main__":
     DCL.the('urls_publicas', CantAccess, 'utilidades')
     DCL.the('modelos', CantInherit, 'modelos')
 
-    #DCL.only('modelos', CanAccess, 'utilidades')
+    DCL.only('modelos', CanAccess, 'utilidades')
+
+
+    DCL.the('urls_publicas', MustCreate, 'modelos')  
 
     DCL.init()
 
     start_system()
 
+    # TODO: abstract this. Maybe a context manager can does this
+    DCL.conclude()
